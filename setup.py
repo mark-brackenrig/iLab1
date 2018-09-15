@@ -9,7 +9,6 @@ Created on Sat Aug 18 12:52:35 2018
 import os
 
 os.chdir('C:/Users/mbrackenrig/Desktop/University/Sem2_18/iLab')
-
 #Lets see whats in the directory
 
 Ontology = os.listdir("Ontology")
@@ -32,17 +31,27 @@ skillGroups = pandas.read_csv("Ontology/skillGroups_en.csv")
 skills = pandas.read_csv("Ontology/skills_en.csv")
 
 #Inspect Columns
-broaderRelationsOccPillar[0:6]
-broaderRelationsSkillPillar[0:6] 
-ISCOGroups[0:6]
-occupationSkillRelations[0:6]
-occupations[0:6]
-skillGroups[0:6]
-skills[0:6]
+#broaderRelationsOccPillar[0:6]
+#broaderRelationsSkillPillar[0:6] 
+#ISCOGroups[0:6]
+#occupationSkillRelations[0:6]
+#occupations[0:6]
+#skillGroups[0:6]
+#skills[0:6]
 
 
 #See unique Values of concept type
-set(skills.conceptType)
-set(skillGroups.conceptType)
-set(occupations.conceptType)
-set(broaderRelationsOccPillar.conceptType)
+#set(skills.conceptType)
+#set(skillGroups.conceptType)
+#set(occupations.conceptType)
+#set(broaderRelationsOccPillar.conceptType)
+
+#Lets read the SLOs and CILOs
+
+CILOs = pandas.read_csv("Subject Data/CILOs.csv")
+
+SLOs = pandas.read_csv("Subject Data/SLOs.csv")
+
+Subjects = pandas.read_csv("Subject Data/Subjects.csv")
+
+print("hello world!")

@@ -56,5 +56,5 @@ for l in range(0,len(subject_codes)):
                     sub= str(regex.sub("�","",str(i.contents[0])))
                     f.writerow([sub,subject_codes.Codes[l] ])
 
-   
+#f.close()
 exit('SLOs.csv')

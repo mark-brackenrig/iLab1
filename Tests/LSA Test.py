@@ -8,41 +8,112 @@ Created on Mon Aug 20 19:52:45 2018
 #Lets try something fun
 
 #LSA in Python
+import os
+
+os.chdir('C:/Users/mbrackenrig/Desktop/University/Sem2_18/iLab/iLab_Repository')
+
+from setup import CILOs, SLOs, Subjects, skills, skillGroups
 
 #import some fun stuff
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.metrics.pairwise import cosine_similarity
+import nltk
+from pywsd.utils import lemmatize_sentence
 
-#What is a count vectorizer
-?CountVectorizer
+#lets try a bigram vectorizer
+cv = CountVectorizer(input= 'content', strip_accents = 'ascii', ngram_range = [2,2]) #I assume this to be content as we will be analysising strings in a DF not files.
 
-cv = CountVectorizer(input= 'content') #I assume this to be content as we will be analysising strings in a DF not files.
+
+#remove punctuation
+skills.description = skills.description.str.replace('[^\w\s]','')
+
+#remove numeric
+skills.description = skills.description.str.replace("\d+", "")
+
+#Change to lowercase
+skills.description = skills.description.str.lower()
+
+#not sure I want to remove stop words yet
+from nltk.corpus import stopwords
+stop = stopwords.words('english')
+skills.description = skills.description.apply(lambda x: " ".join(x for x in x.split() if x not in stop))
+
+
+skills.description = skills.description.apply(lambda x: " ".join(lemmatize_sentence(x)))
 
 #Lets create a DTM
-dtMatrix = cv.fit_transform(skills.description).toarray()
+dtMatrix = cv.fit_transform(skills.description).transpose().toarray()
 #Inspect it
-print(dtMatrix.shape)
+#print(dtMatrix.shape)
 #Print the names of the skills
 featurenames = cv.get_feature_names()
-print(featurenames)
+#print(featurenames)
 
 #Create a tf-idf
 tfidf = TfidfTransformer()
 #Turn DTM into tf-idf matrix
 tfidfMatrix = tfidf.fit_transform(dtMatrix).toarray()
-print(tfidfMatrix.shape)
-
+#print(tfidfMatrix.shape)
+del(dtMatrix)
+#I think at this point here we need to transpose the matrix
+#tfidftranspose = tfidf.fit_transform(dtMatrix).transpose().toarray()
 #SVD is dimensionality reduction down to a managable set
 
-#Reduces the vector space to 100 'terms'
-svd = TruncatedSVD(n_components = 100)
+#Reduces the vector space to 100 'terms' - recommended in text
+svd = TruncatedSVD(n_components = 1500, random_state=42)
+#svdMatrix = svd.fit_transform(tfidftranspose)
 svdMatrix = svd.fit_transform(tfidfMatrix)
+#print(svdMatrix)
+import numpy
+svdsk = numpy.diag(svd.singular_values_)
+svdvk = svd.components_
 
-print(svdMatrix)
+SLO_index = 4991
+#We will get to this a litle later.
+test_query = SLOs.SLOs[SLO_index]
 
-#Create the cosine similarity - This doesnt work!!!!
-#cosine = cosine_similarity(svdMatrix[1], svdMatrix)
+#remove punctuation, numbers, convert to lower case and lemmatize
+test_query = test_query.replace('[^\w\s]','')
+
+test_query = test_query.replace('\d+','')
+
+test_query  = test_query.lower()
+
+test_query = " ".join(lemmatize_sentence(test_query))
+
+test= test_query.split(" ")
+
+import pandas
+
+query = numpy.zeros(shape = (1,len(featurenames)))
+for i in range(0,len(test)):
+    if test[i] in featurenames:
+        query[0,featurenames.index(test[i])] = 1
+
+ 
+results = numpy.matmul(query,svdMatrix)
 
 
+q = numpy.matmul(results,svdsk)
+
+del(results)
+
+cosine = cosine_similarity(q, svdvk.transpose())
+
+
+cosine_df = pandas.DataFrame({'cosine': cosine[0,]})
+doc = numpy.argmax(cosine[0,])
+
+sorts = cosine_df.nlargest(10,'cosine')
+
+print(SLOs.subject_code[SLO_index])
+print(skills.preferredLabel[sorts.index[0:10]])
+
+print(skills.description[doc])
+print(skills.preferredLabel[doc])
+#print(skills.altLabels[doc])
+#print(test_query)
+#print(skills.preferredLabel[2003])
+print(SLOs.subject_code[SLO_index])
