@@ -23,7 +23,7 @@ import nltk
 from pywsd.utils import lemmatize_sentence
 
 #lets try a bigram vectorizer
-cv = CountVectorizer(input= 'content', strip_accents = 'ascii', ngram_range = [2,2]) #I assume this to be content as we will be analysising strings in a DF not files.
+cv = CountVectorizer(input= 'content', strip_accents = 'ascii', ngram_range = [1,2], min_df = 2) #I assume this to be content as we will be analysising strings in a DF not files.
 
 
 #remove punctuation
@@ -62,7 +62,7 @@ del(dtMatrix)
 #SVD is dimensionality reduction down to a managable set
 
 #Reduces the vector space to 100 'terms' - recommended in text
-svd = TruncatedSVD(n_components = 1500, random_state=42)
+svd = TruncatedSVD(n_components = 6000, random_state=42)
 #svdMatrix = svd.fit_transform(tfidftranspose)
 svdMatrix = svd.fit_transform(tfidfMatrix)
 #print(svdMatrix)
