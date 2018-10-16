@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 import pandas
 import csv
 import regex
-subject_codes = pandas.read_csv('Subjects.csv', dtype={'Codes': object})
+subject_codes = pandas.read_csv('Subject Data/Subjects.csv', dtype={'Codes': object})
 
 f = csv.writer(open('SLOs.csv', 'w'))
 f.writerow(['SLOs', "subject_code"])
